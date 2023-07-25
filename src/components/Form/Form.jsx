@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Btn, ErrorText, FormTransfer, Input, Label } from './Form.styled';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import PropTypes from 'prop-types';
+import { ethers } from 'ethers';
 
 export const Form = ({ provider = null, changeLoader, balance, updateBalance }) => {
 	const [errorMessage, setErrorMessage] = useState(
@@ -23,6 +24,9 @@ export const Form = ({ provider = null, changeLoader, balance, updateBalance }) 
 			} else if (!/^(0x)?[0-9a-fA-F]{40}$/.test(values.receiverAddress)) {
 				errors.message = 'Enter a valid address';
 				return errors;
+			} else if (!ethers.isAddress(values.receiverAddress)) {
+				errors.message = `This address is not valid`;
+				return errors;
 			}
 			if (!values.tokenAmount) {
 				errors.message = `Enter the number of tokens to transfer`;
@@ -32,6 +36,9 @@ export const Form = ({ provider = null, changeLoader, balance, updateBalance }) 
 				return errors;
 			} else if (Number(values.tokenAmount) === 0) {
 				errors.message = `Enter a number greater than 0`;
+				return errors;
+			} else if (Number(values.tokenAmount) < 0.000001 || Number(values.tokenAmount) > 100000) {
+				errors.message = `The transfer amount must be between 0.000001 and 100000`;
 				return errors;
 			} else if (values.tokenAmount.replace(',', '.') > balance) {
 				errors.message = `The transfer amount cannot be greater than the balance`;

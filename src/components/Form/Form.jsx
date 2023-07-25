@@ -1,9 +1,11 @@
 import { useFormik } from 'formik';
-import { Button } from '../Button/Button';
+import { transferToken } from '../../ethereumWallet/transferToken';
 import { useState } from 'react';
-import { ErrorText, FormTransfer, Input, Label } from './Form.styled';
+import { Btn, ErrorText, FormTransfer, Input, Label } from './Form.styled';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import PropTypes from 'prop-types';
 
-export const Form = ({ balance }) => {
+export const Form = ({ provider = null, changeLoader, balance, updateBalance }) => {
 	const [errorMessage, setErrorMessage] = useState(
 		'Enter the address of the recipient and the number of tokens to transfer'
 	);
@@ -11,6 +13,10 @@ export const Form = ({ balance }) => {
 		initialValues: { tokenAmount: '', receiverAddress: '' },
 		validate: (values) => {
 			const errors = {};
+			if (!provider) {
+				errors.message = `First you need to connect`;
+				return errors;
+			}
 			if (!values.receiverAddress) {
 				errors.message = `You need to enter the recipient's address`;
 				return errors;
@@ -33,8 +39,14 @@ export const Form = ({ balance }) => {
 			}
 			return errors;
 		},
-		onSubmit: (values) => {
-			console.log(values);
+		onSubmit: async (values) => {
+			changeLoader(true);
+			const result = await transferToken(provider, values.receiverAddress, values.tokenAmount);
+			changeLoader(false);
+			result.status
+				? Notify.success(result.message, { position: 'center-top' })
+				: Notify.failure(result.message, { position: 'center-top' });
+			updateBalance();
 		},
 	});
 
@@ -73,7 +85,14 @@ export const Form = ({ balance }) => {
 				/>
 			</Label>
 			<ErrorText>{errorMessage}</ErrorText>
-			<Button typeButton='submit' text='Submit' />
+			<Btn type='submit'>Submit</Btn>
 		</FormTransfer>
 	);
+};
+
+Form.propTypes = {
+	provider: PropTypes.object,
+	changeLoader: PropTypes.func.isRequired,
+	balance: PropTypes.number,
+	updateBalance: PropTypes.func.isRequired,
 };

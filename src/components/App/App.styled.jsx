@@ -10,7 +10,7 @@ export const Container = styled.div`
 
 export const Header = styled.header`
 	background-color: var(--color-secondary-bg);
-	padding: 15px 0;
+	padding: 15px 25px;
 `;
 
 export const SectionWallet = styled.section`
@@ -37,11 +37,14 @@ export const StatusWallet = styled.p`
 	@media screen and (min-width: ${breakpoints.desktop}) {
 		font-size: 30px;
 	}
+	&.balance {
+		margin-right: 15px;
+	}
 `;
 
 export const AdressText = styled.span`
 	padding: 0 5px;
-	font-size: 16px;
+	font-size: 22px;
 	cursor: pointer;
 	:hover,
 	:focus {

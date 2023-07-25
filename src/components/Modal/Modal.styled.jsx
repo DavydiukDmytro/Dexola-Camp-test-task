@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 
 export const Overlay = styled.div`
+	overflow: hidden;
 	position: fixed;
 	top: 0;
 	left: 0;
